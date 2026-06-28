@@ -7,9 +7,8 @@ const DEFAULT_PROJECTS = [
     title: "WTB – What The Buzz",
     description: "A business and event management platform with distinct Admin, Business, and User panels. Features role-based dashboards, business promotion features, advertisement tools, and JWT authentication.",
     technologies: ["React.js", "Node.js", "Redux", "JWT", "MongoDB", "REST APIs"],
-    imageUrl: "", // We will generate an abstract gradient if empty
-    liveUrl: "https://sachin-basode-portfolio.netlify.app/",
-    githubUrl: "https://github.com/sachinkb2812"
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/sachin-portfolio"
   },
   {
     _id: "r2yn-delivery-2",
@@ -17,8 +16,55 @@ const DEFAULT_PROJECTS = [
     description: "A multi-service online shopping and delivery platform. Features modules for Restaurant, Grocery, Pharmacy, and Recommended Services, alongside product listing, cart, order management, and responsive CSS grids.",
     technologies: ["React.js", "Tailwind CSS", "Redux", "REST APIs", "Responsive Design"],
     imageUrl: "",
-    liveUrl: "https://sachin-basode-portfolio.netlify.app/",
-    githubUrl: "https://github.com/sachinkb2812"
+    githubUrl: "https://github.com/SachinFlynaut11/sachin-portfolio"
+  },
+  {
+    _id: "producthub-mern-3",
+    title: "ProductHub – MERN Store Manager",
+    description: "A full-stack product management application built with the MERN stack. Supports adding, editing, deleting, and listing products with a RESTful API backend and a responsive React frontend.",
+    technologies: ["MongoDB", "Express.js", "React.js", "Node.js", "REST APIs"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/product-mern-project"
+  },
+  {
+    _id: "pettrack-registry-4",
+    title: "PetTrack – Animal Registry System",
+    description: "A web-based registry system for managing pet records. Allows owners to register dogs, update health records, and search entries. Demonstrates CRUD operations with a clean UI.",
+    technologies: ["JavaScript", "Node.js", "MongoDB", "Express.js", "HTML", "CSS"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/dog_registry"
+  },
+  {
+    _id: "taskflow-todo-5",
+    title: "TaskFlow – Next.js Todo App",
+    description: "A fast and minimal task management app built with Next.js. Supports creating, completing, and deleting tasks with persistent state and a sleek, responsive interface.",
+    technologies: ["Next.js", "React.js", "CSS Modules", "JavaScript"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/next-todo"
+  },
+  {
+    _id: "edumanager-crud-6",
+    title: "EduManager – Student Records System",
+    description: "A full-stack application for managing student data with complete Create, Read, Update, and Delete operations. Demonstrates clean API design with a well-structured backend and interactive frontend.",
+    technologies: ["React.js", "Node.js", "MongoDB", "Express.js", "REST APIs"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/student-CRUD-operations"
+  },
+  {
+    _id: "fullstack-api-challenge-7",
+    title: "FullStack API Challenge",
+    description: "A technical full-stack assessment project showcasing REST API design, authentication middleware, and frontend integration. Demonstrates ability to implement real-world features under time constraints.",
+    technologies: ["Node.js", "Express.js", "MongoDB", "React.js", "JWT"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/nadsoft-test"
+  },
+  {
+    _id: "stocksense-inventory-8",
+    title: "StockSense – Inventory Dashboard",
+    description: "A product inventory management system with real-time stock tracking, add/edit/delete operations, and category filtering. Built for business workflows with a clean dashboard UI.",
+    technologies: ["React.js", "Node.js", "MongoDB", "Express.js", "Tailwind CSS"],
+    imageUrl: "",
+    githubUrl: "https://github.com/SachinFlynaut11/product-inventory-system"
   }
 ];
 
@@ -26,14 +72,20 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    // Load projects from local storage. Seed default ones if none exist.
-    const localProjectsStr = localStorage.getItem("local_projects");
-    if (!localProjectsStr) {
+    // Version stamp — bump this whenever DEFAULT_PROJECTS changes to force a reseed
+    const PROJECT_VERSION = "v3";
+    const storedVersion = localStorage.getItem("local_projects_version");
+
+    if (storedVersion !== PROJECT_VERSION) {
+      // Reseed with the latest default projects
       localStorage.setItem("local_projects", JSON.stringify(DEFAULT_PROJECTS));
+      localStorage.setItem("local_projects_version", PROJECT_VERSION);
       setProjects(DEFAULT_PROJECTS);
     } else {
+      // Load from local storage (may include admin-added projects)
       try {
-        const parsed = JSON.parse(localProjectsStr);
+        const localProjectsStr = localStorage.getItem("local_projects");
+        const parsed = localProjectsStr ? JSON.parse(localProjectsStr) : DEFAULT_PROJECTS;
         setProjects(parsed);
       } catch (e) {
         setProjects(DEFAULT_PROJECTS);
