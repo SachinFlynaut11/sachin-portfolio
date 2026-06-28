@@ -1,7 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { FolderPlus, ArrowLeft } from "lucide-react";
 
 const AddProject = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -24,19 +26,27 @@ const AddProject = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setStatus("");
 
-    const token = localStorage.getItem("token");
-    const payload = {
-      ...formData,
-      technologies: formData.technologies.split(",").map(tech => tech.trim())
-    };
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      await axios.post("http://localhost:5000/api/projects", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const newProject = {
+        _id: 'proj-' + Date.now(),
+        title: formData.title,
+        description: formData.description,
+        technologies: formData.technologies.split(",").map(tech => tech.trim()).filter(Boolean),
+        imageUrl: formData.imageUrl,
+        liveUrl: formData.liveUrl,
+        githubUrl: formData.githubUrl,
+        createdAt: new Date().toISOString()
+      };
+
+      const existing = localStorage.getItem("local_projects");
+      const projectsList = existing ? JSON.parse(existing) : [];
+      projectsList.push(newProject);
+      localStorage.setItem("local_projects", JSON.stringify(projectsList));
 
       setStatus("Project added successfully!");
       setFormData({
@@ -47,96 +57,129 @@ const AddProject = () => {
         liveUrl: "",
         githubUrl: ""
       });
+      
+      setTimeout(() => navigate("/admin/dashboard/projects"), 1200);
     } catch (error) {
       console.error(error);
       setStatus("Failed to add project.");
     } finally {
       setLoading(false);
-      setTimeout(() => setStatus(""), 3000);
     }
   };
 
   return (
-    <div className="container py-4">
-      <h2 className="mb-4">Add New Project</h2>
-      <form onSubmit={handleSubmit} className="border p-4 rounded bg-light">
-        <div className="mb-3">
-          <label className="form-label">Project Title</label>
-          <input
-            type="text"
-            className="form-control"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Description</label>
-          <textarea
-            className="form-control"
-            name="description"
-            rows="3"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Technologies (comma separated)</label>
-          <input
-            type="text"
-            className="form-control"
-            name="technologies"
-            value={formData.technologies}
-            onChange={handleChange}
-            placeholder="e.g. React, Node.js, MongoDB"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Image URL</label>
-          <input
-            type="text"
-            className="form-control"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Live URL</label>
-          <input
-            type="text"
-            className="form-control"
-            name="liveUrl"
-            value={formData.liveUrl}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">GitHub URL</label>
-          <input
-            type="text"
-            className="form-control"
-            name="githubUrl"
-            value={formData.githubUrl}
-            onChange={handleChange}
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Submitting..." : "Add Project"}
+    <div className="container py-4 text-start">
+      <div className="d-flex align-items-center gap-3 mb-4">
+        <button 
+          onClick={() => navigate("/admin/dashboard/projects")} 
+          className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"
+          style={{ borderRadius: "8px" }}
+        >
+          <ArrowLeft size={16} /> Back
         </button>
+        <h2 className="m-0">Add New Project</h2>
+      </div>
 
+      <div className="card-glass p-4">
         {status && (
-          <div className="mt-3 text-success">{status}</div>
+          <div className="alert alert-success border-success text-success bg-success bg-opacity-10 mb-4" role="alert">
+            {status}
+          </div>
         )}
-      </form>
+
+        <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+          <div className="form-group text-start">
+            <label className="form-label text-white">Project Title</label>
+            <input
+              type="text"
+              className="form-control form-glass"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label className="form-label text-white">Description</label>
+            <textarea
+              className="form-control form-glass"
+              name="description"
+              rows="4"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            ></textarea>
+          </div>
+
+          <div className="form-group text-start">
+            <label className="form-label text-white">Technologies (comma separated)</label>
+            <input
+              type="text"
+              className="form-control form-glass"
+              name="technologies"
+              value={formData.technologies}
+              onChange={handleChange}
+              placeholder="e.g. React, Node.js, Redux, Express.js"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label className="form-label text-white">Image URL</label>
+            <input
+              type="text"
+              className="form-control form-glass"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              placeholder="https://example.com/project-image.jpg"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label className="form-label text-white">Live URL</label>
+            <input
+              type="text"
+              className="form-control form-glass"
+              name="liveUrl"
+              value={formData.liveUrl}
+              onChange={handleChange}
+              placeholder="https://my-demo.com"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group text-start">
+            <label className="form-label text-white">GitHub URL</label>
+            <input
+              type="text"
+              className="form-control form-glass"
+              name="githubUrl"
+              value={formData.githubUrl}
+              onChange={handleChange}
+              placeholder="https://github.com/my-profile/project"
+              disabled={loading}
+            />
+          </div>
+
+          <button type="submit" className="btn-premium py-3 d-flex align-items-center justify-content-center gap-2 mt-3" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Adding Project...
+              </>
+            ) : (
+              <>
+                <FolderPlus size={18} /> Add Project
+              </>
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

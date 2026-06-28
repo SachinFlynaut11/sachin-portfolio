@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -11,51 +10,41 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // Verify token validity
-      fetchUser();
-    } else {
-      setLoading(false);
+    if (token === 'mock-jwt-token') {
+      setUser({
+        id: 'sachin-123',
+        email: 'sachin@portfolio.com',
+        name: 'Sachin Bansode',
+        role: 'admin'
+      });
     }
+    setLoading(false);
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      // Add user verification endpoint if needed
-       const response = await axios.get('http://localhost:5000/api/auth/user');
-      
-      const { user } = response.data;
-      setUser(user);
-      setLoading(false);
-    } catch (error) {
-      logout();
-    }
-  };
-
   const login = async (email, password) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
-        password
-      });
-      
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser(user);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    if (email === 'sachin@portfolio.com' && password === 'admin') {
+      const mockUser = {
+        id: 'sachin-123',
+        email: 'sachin@portfolio.com',
+        name: 'Sachin Bansode',
+        role: 'admin'
+      };
+      localStorage.setItem('token', 'mock-jwt-token');
+      setUser(mockUser);
       return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+    } else {
+      return {
+        success: false,
+        message: 'Invalid email or password. Use sachin@portfolio.com and admin.'
       };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
